@@ -8,7 +8,7 @@
                   0 0 0 0])
 
 (expect nil (solve 4 5))
-(expect [(insert-queens [1 2 3 4] empty_board)]
+(expect [(insert-queens [1 7 8 14] empty_board) (insert-queens [2 4 11 13] empty_board) ]
          (solve 4 3))
 
 (expect  [1 0 0 0
@@ -31,4 +31,11 @@
 
 (expect [0 0 0
          0 0 0
-         0 0 0] (make-board 3))
+         0 0 0] 
+        (make-board 3))
+
+(expect true 
+        (solved? (insert-queens [1 7 11 14] empty_board) 4))
+
+(expect false
+        (solved? (insert-queens [1 7 11 10] empty_board) 4))
