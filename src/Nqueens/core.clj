@@ -20,14 +20,42 @@
 
 ;; board number_queens -> boolean
 ;; checks if a board is solved
-;; TODO
-(defn solved? [b n_queens] false)
+(defn solved? [b n_queens]
+  (<= n_queens
+      (count (filter #(= 1 % ) b))))
+
+;; board -> pos or -1
+;; gets the last pos where a queen is present
+(defn get-last-queen [b]
+  (.lastIndexOf b 1))
+
+;; pos board -> board
+;; inserts a queen at the given position
+(defn insert-queen [pos board]
+  (concat (take pos board) '(1) (drop (inc pos) board)))
+
+
+;; listofPos board -> board
+;; inserts a queens at various positions passed as a list
+(defn insert-queens [lop board]
+  (if (list? lop)
+    board
+    (let [new_board (insert-queen (first lop) board)]
+      (insert-queens (rest lop) new_board))))
+
+;; board -> boolean
+;; checks if a board has its queen not atacking each other
+(defn valid? [b] false)
 
 ;; board -> listofBoards
 ;; get all valid boards which have one more queen
 ;; that the passed boars
-;; TODO
-(defn get-valid-boards-one-more-queen [b] '())
+(defn get-valid-boards-one-more-queen [b]
+  (let [last-queen-pos (get-last-queen b)]
+    (for [x (range (inc last-queen-pos) (count b))
+          :let [new-board (insert-queen x b)]
+          :when (valid? new-board)]
+      new-board)))
 
 ;; size n_queens -> listofBoard
 ;; produces the complete list size length boards where
@@ -41,18 +69,3 @@
               b
               (solve--listofBoards (get-valid-boards-one-more-queen b))))]  ; lets descent it to the board children
     (solve--board (make-board size))))
-
-;; pos board -> board
-;; inserts a queen at the given position
-(defn insert-queen [pos board]
-  (concat (take pos board) '(1) (drop (inc pos) board)))
-
-;; listofPos board -> board
-;; inserts a queens at various positions passed as a list
-(defn insert-queens [lop board]
-  (if (list? lop)
-    board
-    (let [new_board (insert-queen (first lop) board)]
-      (insert-queens (rest lop) new_board))))
-
-
