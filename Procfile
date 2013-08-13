@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -cp target/Nqueens-standalone.jar clojure.main -m Nqueens.core $PORT
+web: java $JVM_OPTS -cp target/nqueens-standalone.jar clojure.main -m Nqueens.core $PORT

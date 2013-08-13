@@ -32,6 +32,12 @@ A more detailed rubric will be published when the self-assessment period begins,
 
 FIXME: write
 
+### Heroku
+
+   $ heroku apps:create
+   $ git push heroku master
+
+
 ## License
 
 Copyright (C) 2013 FIXME

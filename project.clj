@@ -9,7 +9,7 @@
   :dev-dependencies [[lein-autoexpect "0.2.5"]
                      [lein-expectations "0.0.5"]]
 
-  :uberjar-name "helloworld-standalone.jar"
+  :uberjar-name "nqueens-standalone.jar"
 
   :min-lein-version "1.7.1")
 
