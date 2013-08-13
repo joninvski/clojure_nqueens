@@ -10,5 +10,5 @@
 
   :uberjar-name "nqueens-standalone.jar"
 
-  :min-lein-version "1.7.1")
+  :min-lein-version "2.0.0")
 
