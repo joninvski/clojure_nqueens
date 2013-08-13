@@ -5,7 +5,6 @@
                  [org.clojure/clojure-contrib "1.2.0"]
                  [ring/ring-jetty-adapter "1.1.6"]]
 
-
   :dev-dependencies [[lein-autoexpect "0.2.5"]
                      [lein-expectations "0.0.5"]]
 
