@@ -1,4 +1,5 @@
-(ns Nqueens.core)
+(ns Nqueens.core
+   (:require [ring.adapter.jetty :as jetty]))
 
 (use '[clojure.contrib.seq :only (positions)])
 
@@ -107,3 +108,12 @@
               b
               (solve--listofBoards (get-valid-boards-one-more-queen b size))))]  ; lets descend it to the board children
     (solve--board (make-board size))))
+
+
+(defn app [req]
+    {:status 200
+        :headers {"Content-Type" "text/plain"}
+        :body "Hello, world"})
+
+(defn -main [port]
+    (jetty/run-jetty app {:port (Integer. port) :join? false}))
