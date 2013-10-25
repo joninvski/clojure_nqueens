@@ -37,7 +37,6 @@ FIXME: write
    $ heroku apps:create
    $ git push heroku master
 
-
 ## License
 
 Copyright (C) 2013 FIXME

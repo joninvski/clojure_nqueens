@@ -1,7 +1,8 @@
 (ns Nqueens.core
-   (:require [ring.adapter.jetty :as jetty]))
+  (:require [ring.adapter.jetty :as jetty]))
 
 (use '[clojure.contrib.seq :only (positions)])
+(use 'clojure.contrib.combinatorics)
 
 ; Constants:
 
@@ -36,49 +37,55 @@
 (defn insert-queen [pos board]
   (assoc board pos 1))
 
-
 ;; listofPos board -> board
-;; inserts a queens at various positions passed as a list
+;; inserts a queens at various positions passed as a list (lop -> list of positions)
 (defn insert-queens [lop board]
   (if (list? lop)
     board
     (let [new-board (insert-queen (first lop) board)]
       (insert-queens (rest lop) new-board))))
 
+;; board position board_size -> boolean
 ;; checks if a queen is not attacking another
-;; only checks positions in forward of the queen
-(defn valid-queen? [b p size]
-  (letfn [(only-one-queen-horizontal []
-            (let [start-row-pos (- p (rem p size))
-                  end-row-pos   (+ start-row-pos size)
-                  row-positions (subvec (vec b) start-row-pos end-row-pos)]
-              (< (count (filter #(= % 1) row-positions)) 2)))
-          (only-one-queen-vertical []
-            (let [collum-index (rem p size)
-                  collum-pieces(for [i (range 0 (* size size))
-                                     :when (= collum-index (rem i size))]
-                                 (b i))]
-              (< (count (filter #(= % 1) collum-pieces)) 2)))
-          (only-one-queen-diagonals []
-            (let [collum-index (rem p size)
-                  diagonal-to-top-left-pos     (filter #(< (rem % size) collum-index) (range p -1            (* (+ size 1) -1)))
-                  diagonal-to-top-right-pos    (filter #(> (rem % size) collum-index) (range p -1            (* (- size 1) -1)))
-                  diagonal-to-bottom-left-pos  (filter #(< (rem % size) collum-index) (range p (* size size)    (- size 1)   ))
-                  diagonal-to-bottom-right-pos (filter #(> (rem % size) collum-index) (range p (* size size)    (+ size 1)   ))]
-              (< (+ (count (filter #(= % 1) (for [i diagonal-to-top-left-pos    ] (b i))))
-                    (count (filter #(= % 1) (for [i diagonal-to-top-right-pos   ] (b i))))
-                    (count (filter #(= % 1) (for [i diagonal-to-bottom-left-pos ] (b i))))
-                    (count (filter #(= % 1) (for [i diagonal-to-bottom-right-pos] (b i)))))
-                 1)))]
-    (and (only-one-queen-vertical)
-      (only-one-queen-horizontal)
-      (only-one-queen-diagonals))))
+;; only checks positions forward of the queen
+(defn valid-queen-pair? [p1 p2 size]
+  (let [x1 (rem p1 size)
+        x2 (rem p2 size)
+        y1 (int (/ p1 size))
+        y2 (int (/ p2 size))
+        ]
+    (and
+      (not= x1 x2)
+      (not= y1 y2)
+      (not= (- x2 x1) (- y2 y1))
+      (not= (- x1 y2) (- x2 y1)))
+    ))
 
 ;; board -> boolean
 ;; checks if all queens in the board are not attacking another queen
 (defn valid? [b size]
-  (let [queen-positions (map first (filter #(= 1 (second %)) (map-indexed vector b)))]
-    (every? #(valid-queen? b % size) queen-positions))) ; checks if it is valid for every queen on board
+  (let [queen-positions (map first (filter #(= 1 (second %)) (map-indexed vector b)))
+        all-combinations (vec (map vec (combinations queen-positions 2)))]
+    ; (println queen-positions)
+    ; (println all-combinations)
+    ; (if (< 4 (count queen-positions)) (System/exit 0))
+    ; all-combinations))
+    (every? #(valid-queen-pair? (first %) (second %) size) all-combinations))) ; checks if it is valid for every queen on board
+
+(defn print-board [board size]
+  (letfn [(aux [b]
+            (when (seq b)
+              (print (first b) ": " )
+              (when (= (rem (count b) size) 1)
+                (println ""))
+              (recur (rest b))))]
+    (println "")
+    (when (seq board)
+      (do
+        (println "")
+        (aux board))))
+    (println "---" (count board))
+  )
 
 ;; board -> listofBoards
 ;; get all valid boards which have one more queen
@@ -87,9 +94,11 @@
   (let [last-queen-pos (get-last-queen b)]
     (for [x (range (inc last-queen-pos) (count b))
           :let [new-board (insert-queen x b)]
-          :when (valid? new-board size)]
-        (when (seq new-board)
-          new-board))))
+          :when (or (= last-queen-pos -1)
+                    (and (valid-queen-pair? last-queen-pos x size)
+                         (valid? new-board size)))]
+      (when (seq new-board)
+        new-board))))
 
 ;; size n-queens -> listofBoard
 ;; produces the complete list size length boards where
@@ -97,23 +106,19 @@
 ;; if no solution is possible, nil is returned
 (defn solve [size n-queens]
   (letfn [(solve--listofBoards [lob]                                        ; solves list of board
-            (reduce (fn [l b]
-                      (let [new-board (solve--board b)]
-                        (if(seq new-board)
-                          (conj l (flatten (solve--board b)))
-                          l)))
-                    [] lob))                                                ; goes to each board and solves it at a time
+            (if (seq lob)
+              (let [new-board (solve--board (first lob))]                   ; goes to each board and solves it at a time
+                (conj  (solve--listofBoards (rest lob)) new-board))))
           (solve--board [b]                                                 ; solves individual board
             (if (solved? b n-queens)
               b
               (solve--listofBoards (get-valid-boards-one-more-queen b size))))]  ; lets descend it to the board children
     (solve--board (make-board size))))
 
-
 (defn app [req]
-    {:status 200
-        :headers {"Content-Type" "text/plain"}
-        :body "Hello, world"})
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body "Hello, world"})
 
 (defn -main [port]
-    (jetty/run-jetty app {:port (Integer. port) :join? false}))
+  (jetty/run-jetty app {:port (Integer. port) :join? false}))
