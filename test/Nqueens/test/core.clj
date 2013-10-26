@@ -11,21 +11,20 @@
 ; Impossible solve
 (expect [] (solve 4 5))
 (expect 0 (count (solve 3 3)))
+; ;
+; ; fast test
+(expect 2 (count (solve 4 4)))
 
-; fast test
-(expect nil (println (solve 4 4)))
-
-; ; medium test
+; ; ; medium test
 (expect 10 (count (solve 5 5)))
-; (expect nil (map #(print-board % 3) (solve 3 2)))
 
-; ; medium speed test
+; ; ; medium speed test
 (expect 4 (count (solve 6 6)))
 
-; ; medium speed test
-; (expect 40 (count (solve 7 7)))
+; ; ; medium speed test
+(expect 40 (count (solve 7 7)))
 
-; ; ; slow test
+; ; ; ; slow test
 ; (expect 92 (count (solve 8 8)))
 
 (expect [(insert-queens [1 7 8 14] empty-board) (insert-queens [2 4 11 13] empty-board) ]
@@ -131,20 +130,3 @@
 
 (expect false
         (valid? (insert-queens [0 10] empty-board) 4))
-
-; ; Only a queen
-; (expect true
-;         (valid-queen? (insert-queens [3] empty-board) 3 4))
-
-; ; Two queens in the same row
-; (expect false
-;         (valid-queen? (insert-queens [1 2] empty-board) 1 4))
-
-; ; Two queens in the same collumn
-; (expect false
-;         (valid-queen? (insert-queens [1 5] empty-board) 1 4))
-
-; ; Two queens in the same diagonal
-; (expect false
-;         (valid-queen? (insert-queens [1 6] empty-board) 1 4))
-

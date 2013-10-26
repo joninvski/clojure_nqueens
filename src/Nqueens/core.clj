@@ -105,20 +105,29 @@
 ;; n-queens of queens are in non-attacking positions
 ;; if no solution is possible, nil is returned
 (defn solve [size n-queens]
-  (letfn [(solve--listofBoards [lob]                                        ; solves list of board
+  (letfn [(solve--listofBoards [lob acum]                                        ; solves list of board
+            ; (print "-")
             (if (seq lob)
-              (let [new-board (solve--board (first lob))]                   ; goes to each board and solves it at a time
-                (conj  (solve--listofBoards (rest lob)) new-board))))
-          (solve--board [b]                                                 ; solves individual board
+              (let [[got_result? new-board] (solve--board (first lob) acum)]     ; goes to each board and solves it at a time
+                  (solve--listofBoards (rest lob) (if got_result?
+                                                    (conj acum new-board)
+                                                    (concat acum new-board))))
+              acum
+              ))
+          (solve--board [b acum]                                                 ; solves individual board
+            ; (println "Got board" acum)
+            ; (print "\n.")
             (if (solved? b n-queens)
-              b
-              (solve--listofBoards (get-valid-boards-one-more-queen b size))))]  ; lets descend it to the board children
-    (solve--board (make-board size))))
+              [true b]
+              [false (solve--listofBoards (get-valid-boards-one-more-queen b size) [])]))
+          ]  ; lets descend it to the board children
+    (second (solve--board (make-board size) []))))
 
 (defn app [req]
   {:status 200
    :headers {"Content-Type" "text/plain"}
    :body "Hello, world"})
+
 
 (defn -main [port]
   (jetty/run-jetty app {:port (Integer. port) :join? false}))
