@@ -9,9 +9,9 @@ Solver for the n queens problem in clojure.
 
     lein uberjar && java -jar nqueens-standalone.jar
 
-To see the options do :
+To see the options do:
 
-    java -jar nqueens-standalone.jar
+    java -jar nqueens-standalone.jar --help
 
 ## Distributing
 
