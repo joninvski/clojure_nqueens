@@ -1,6 +1,8 @@
 Clojure NQueens
 ===============
 
+[![Build Status](https://travis-ci.org/joninvski/clojure_nqueens.png?branch=master)](https://travis-ci.org/joninvski/clojure_nqueens)
+
 Solver for the n queens problem in clojure.
 
 ## Running
