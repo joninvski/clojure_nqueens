@@ -1,5 +1,7 @@
 (ns Nqueens.core
-  (:require [ring.adapter.jetty :as jetty]))
+  (:gen-class)
+  (:require [ring.adapter.jetty :as jetty])
+  (:use clojure.contrib.command-line))
 
 (use '[clojure.contrib.seq :only (positions)])
 (use 'clojure.contrib.combinatorics)
@@ -64,14 +66,14 @@
   (let [queen-positions (map first (filter #(= 1 (second %)) (map-indexed vector b)))
         all-combinations (vec (map vec (combinations queen-positions 2)))]
     (every? #(valid-queen-pair?  ; checks if it is valid for every queen on board
-               (first %)
-               (second %)
-               size)
+                                (first %)
+                                (second %)
+                                size)
             all-combinations)))
 
 ;; board size -> Nothing
 ;; Prints a board
-(defn print-board [board size]
+(defn board-str [board size]
   (letfn [(aux [b]
             (when (seq b)
               (print (first b) ": " )
@@ -83,7 +85,7 @@
       (do
         (println "")
         (aux board))))
-    (println "---" (count board)))
+  (println "---"))
 
 ;; board size -> listofBoards
 ;; get all valid boards which have one more queen
@@ -118,10 +120,26 @@
               [false (solve--listofBoards (get-valid-boards-one-more-queen b size) [])]))]
     (second (solve--board (make-board size) []))))
 
-(defn app [req]
-  {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello, world"})
+; (defn app [req]
+;   {:status 200
+;    :headers {"Content-Type" "text/plain"}
+;    :body "Hello, world"})
 
-(defn -main [port]
-  (jetty/run-jetty app {:port (Integer. port) :join? false}))
+; (defn -main [port]
+;   (jetty/run-jetty app {:port (Integer. port) :join? false}))
+
+(defn -main [& args]
+  (with-command-line args
+    "Usage: java -jar Nqueens-0.0.1-alpha.jar [-b num] [-q num]"
+    [[board-size  b?  "Board Size"       5]
+     [nqueens     q?  "Number of queens" 5]]
+    (if (not= (count args) 2)
+      (do
+        (println args)
+        (println "Wrong number argumengs: Run with --help to see options")
+        ((System/exit 1)))
+      (do
+        (println "Board size" board-size)
+        (println "Number of queens" nqueens)
+        (let [solutions (solve board-size nqueens)]
+          (reduce #(concat (board-str %1 board-size) %2) solutions))))))

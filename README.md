@@ -5,7 +5,15 @@ Solver for the n queens problem in clojure.
 
 ## Running
 
-FIXME: TODO - pass the command line options
+    lein uberjar && java -jar nqueens-standalone.jar
+
+To see the options do :
+
+    java -jar nqueens-standalone.jar
+
+## Distributing
+
+    lein uberjar
 
 ### Testing
 
@@ -18,6 +26,6 @@ FIXME: TODO - pass the command line options
 
 ## License
 
-Copyright (C) 2013 FIXME
+Copyright (C) 2013 Joao Trindade
 
 Distributed under the Apache License
